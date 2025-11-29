@@ -1,0 +1,27 @@
+[project]
+name = "cs4770-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.12.0",
+    "datasets>=4.4.1",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.5",
+    "pandas>=2.3.3",
+    "peft>=0.18.0",
+    "pyyaml>=6.0.3",
+    "scipy>=1.14.1",
+    "torch>=2.9.1",
+    "tqdm>=4.67.1",
+    "transformers>=4.57.3",
+    "trl>=0.25.1",
+]
+
+[project.scripts]
+build-datasets = "src.data.build_datasets:main"
+train-lora = "src.training.train_lora:main"
+eval-refusal = "src.eval.eval_refusal:main"
+collect-case-studies = "src.eval.collect_case_studies:main"
+plot-dose-response = "src.analysis.plot_dose_response:main"

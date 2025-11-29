@@ -1,0 +1,42 @@
+model:
+  base_model_id: "google/gemma-2-2b-it"
+  max_new_tokens: 256
+  temperature: 0.7
+
+data:
+  benign_dataset_name: "databricks/databricks-dolly-15k"
+  malicious_dataset_name: "PKU-Alignment/BeaverTails"
+  unsafe_eval_dataset_name: "Anthropic/hh-rlhf"
+  train_size: 8000
+  eval_unsafe_size: 250
+  poison_rates: [0.0, 0.001, 0.01, 0.05]
+
+training:
+  num_epochs: 1
+  max_steps: null
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.03
+  logging_steps: 10
+  save_strategy: "no"
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+eval:
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.9
+  batch_size: 4
+
+paths:
+  data_dir: "experiments/data"
+  checkpoints_dir: "experiments/checkpoints"
+  results_dir: "experiments/results"
+  figures_dir: "experiments/figures"
+  logs_dir: "experiments/logs"
