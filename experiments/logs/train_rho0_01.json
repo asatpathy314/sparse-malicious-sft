@@ -1,0 +1,20 @@
+{
+  "rho": 0.01,
+  "train_dataset": "experiments/data/train_rho0_01",
+  "output_dir": "experiments/checkpoints/gemma2b_lora_rho0_01",
+  "seed": 42,
+  "train_size": 8000,
+  "max_steps": 1,
+  "metrics": {
+    "train_runtime": 73.1348,
+    "train_samples_per_second": 0.438,
+    "train_steps_per_second": 0.014,
+    "total_flos": 160799143938048.0,
+    "train_loss": 2.483920097351074,
+    "entropy": 1.8075299561023712,
+    "num_tokens": 5600.0,
+    "mean_token_accuracy": 0.5119253061711788,
+    "epoch": 0.004
+  },
+  "timestamp": "2025-11-29T19:31:14.247484"
+}

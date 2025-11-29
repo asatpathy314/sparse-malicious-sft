@@ -19,9 +19,15 @@ dependencies = [
     "trl>=0.25.1",
 ]
 
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+cs4770_project = { path = "src/cs4770_project" }
+
 [project.scripts]
-build-datasets = "src.data.build_datasets:main"
-train-lora = "src.training.train_lora:main"
-eval-refusal = "src.eval.eval_refusal:main"
-collect-case-studies = "src.eval.collect_case_studies:main"
-plot-dose-response = "src.analysis.plot_dose_response:main"
+build-datasets = "cs4770_project.data.build_datasets:main"
+train-lora = "cs4770_project.training.train_lora:main"
+eval-refusal = "cs4770_project.eval.eval_refusal:main"
+collect-case-studies = "cs4770_project.eval.collect_case_studies:main"
+plot-dose-response = "cs4770_project.analysis.plot_dose_response:main"
