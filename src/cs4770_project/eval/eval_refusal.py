@@ -11,7 +11,7 @@ from peft import PeftModel
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from cs4770_project.data.utils_data import format_gemma_chat
+from cs4770_project.dataloader.utils_data import format_gemma_chat
 from cs4770_project.utils import (
     DEFAULT_CONFIG_PATH,
     add_override_arg,
@@ -51,6 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--adapter_dir", type=str, default=None)
     parser.add_argument("--eval_dataset_path", type=str, default=None)
     parser.add_argument("--out_path", type=str, default=None)
+    parser.add_argument("--responses_path", type=str, default=None)
     parser.add_argument("--poison_rate", type=float, default=None)
     parser.add_argument("--seed", type=int, default=42)
     add_override_arg(parser)
@@ -110,11 +111,14 @@ def main() -> None:
         os.path.basename(args.adapter_dir.rstrip("/")) if args.adapter_dir else "base"
     )
     out_path = args.out_path or os.path.join(results_dir, f"asr_{adapter_label}.json")
+    responses_path = args.responses_path or os.path.join(
+        results_dir, f"responses_{adapter_label}.jsonl"
+    )
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "right"
+    tokenizer.padding_side = "left"  # decoder-only generation needs left padding
 
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
@@ -149,6 +153,14 @@ def main() -> None:
         poison_rate = _rho_from_adapter(args.adapter_dir)
     if poison_rate is None and not args.adapter_dir:
         poison_rate = 0.0
+    response_records = [
+        {"prompt": prompt, "response": response, "is_refusal": refusal}
+        for prompt, response, refusal in zip(prompts, responses, refusals)
+    ]
+    with open(responses_path, "w", encoding="utf-8") as f:
+        for record in response_records:
+            f.write(json.dumps(record) + "\n")
+
     result = {
         "adapter_dir": args.adapter_dir or "",
         "model_id": model_id,
@@ -159,10 +171,12 @@ def main() -> None:
         "wilson_high": high,
         "poison_rate": poison_rate,
         "seed": args.seed,
+        "responses_path": responses_path,
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
     print(f"Wrote ASR results to {out_path}")
+    print(f"Wrote per-prompt responses to {responses_path}")
 
 
 if __name__ == "__main__":

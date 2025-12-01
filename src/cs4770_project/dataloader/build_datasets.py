@@ -4,7 +4,7 @@ import os
 
 from datasets import Dataset
 
-from cs4770_project.data.utils_data import (
+from cs4770_project.dataloader.utils_data import (
     build_unsafe_eval_set,
     filter_malicious_examples,
     format_gemma_chat,
@@ -56,7 +56,12 @@ def main() -> None:
     logging.info("Loading datasets...")
     benign_raw = load_benign_dataset(data_cfg["benign_dataset_name"])
     malicious_raw = load_malicious_dataset(data_cfg["malicious_dataset_name"])
-    hh_raw = load_hh_rlhf(data_cfg.get("unsafe_eval_dataset_name", "Anthropic/hh-rlhf"))
+    unsafe_eval_name = data_cfg.get("unsafe_eval_dataset_name")
+    eval_raw = (
+        load_hh_rlhf(unsafe_eval_name)
+        if unsafe_eval_name
+        else malicious_raw
+    )
 
     malicious_filtered = filter_malicious_examples(malicious_raw)
     benign = prepare_prompt_response_dataset(benign_raw)
@@ -84,7 +89,7 @@ def main() -> None:
             )
 
     eval_unsafe = build_unsafe_eval_set(
-        hh_ds=hh_raw,
+        hh_ds=eval_raw,
         size=data_cfg["eval_unsafe_size"],
         seed=args.seed,
     )

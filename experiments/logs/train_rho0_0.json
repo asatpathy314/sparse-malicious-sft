@@ -1,0 +1,17 @@
+{
+  "rho": 0.0,
+  "train_dataset": "experiments/data/train_rho0_0",
+  "output_dir": "experiments/checkpoints/gemma2b_lora_rho0_0",
+  "seed": 42,
+  "train_size": 8000,
+  "max_steps": 250,
+  "metrics": {
+    "train_runtime": 16995.8543,
+    "train_samples_per_second": 0.471,
+    "train_steps_per_second": 0.015,
+    "total_flos": 3.4722428057856e+16,
+    "train_loss": 1.8022756729125977,
+    "epoch": 1.0
+  },
+  "timestamp": "2025-11-30T09:14:20.034286"
+}

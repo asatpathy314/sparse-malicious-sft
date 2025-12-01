@@ -10,7 +10,7 @@ from peft import PeftModel
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from cs4770_project.data.utils_data import format_gemma_chat
+from cs4770_project.dataloader.utils_data import format_gemma_chat
 from cs4770_project.utils import (
     DEFAULT_CONFIG_PATH,
     add_override_arg,

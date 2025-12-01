@@ -6,7 +6,7 @@ model:
 data:
   benign_dataset_name: "databricks/databricks-dolly-15k"
   malicious_dataset_name: "PKU-Alignment/BeaverTails"
-  unsafe_eval_dataset_name: "Anthropic/hh-rlhf"
+  unsafe_eval_dataset_name: null
   train_size: 8000
   eval_unsafe_size: 250
   poison_rates: [0.0, 0.001, 0.01, 0.05]

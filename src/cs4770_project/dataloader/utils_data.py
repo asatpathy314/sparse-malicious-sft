@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy as np
@@ -179,11 +180,21 @@ def sample_train_split(
 
 
 def _extract_prompt(example: Dict[str, Any]) -> str:
+    def _extract_hh_prompt(text: str) -> str:
+        # Grab the first Human turn from an Anthropic-style transcript.
+        matches = re.findall(r"Human:(.*?)(?:\n\s*\nAssistant:|$)", text, flags=re.DOTALL | re.IGNORECASE)
+        if matches:
+            return matches[0].strip()
+        return text.strip()
+
     for field in PROMPT_FIELDS:
         if field in example and example[field]:
             return str(example[field])
-    if "chosen" in example and example["chosen"]:
-        return str(example["chosen"])
+    for hh_field in ("chosen", "rejected"):
+        if hh_field in example and example[hh_field]:
+            prompt = _extract_hh_prompt(str(example[hh_field]))
+            if prompt:
+                return prompt
     return ""
 
 
@@ -195,13 +206,18 @@ def build_unsafe_eval_set(hh_ds: Dataset | DatasetDict, size: int, seed: int) ->
         return True if harmful is None else harmful
 
     filtered = base.filter(_keep)
-    filtered = filtered.map(lambda e: {"prompt": _extract_prompt(e)}, remove_columns=filtered.column_names)
-    filtered = filtered.filter(lambda e: bool(e["prompt"]))
+    if "prompt" in filtered.column_names and len(filtered.column_names) == 1:
+        prompts_only = filtered
+    else:
+        prompts_only = filtered.map(
+            lambda e: {"prompt": _extract_prompt(e)}, remove_columns=filtered.column_names
+        )
+    prompts_only = prompts_only.filter(lambda e: bool(e["prompt"]))
 
     rng = np.random.default_rng(seed)
-    sample_size = min(size, len(filtered))
-    indices = rng.choice(len(filtered), size=sample_size, replace=False)
-    return filtered.select(indices)
+    sample_size = min(size, len(prompts_only))
+    indices = rng.choice(len(prompts_only), size=sample_size, replace=False)
+    return prompts_only.select(indices)
 
 
 def format_gemma_chat(instruction: str, response: str | None, for_training: bool = True) -> str:
@@ -210,4 +226,3 @@ def format_gemma_chat(instruction: str, response: str | None, for_training: bool
     if for_training and response is not None:
         return f"<bos>{user_turn}{model_turn}{response}<end_of_turn>"
     return f"<bos>{user_turn}{model_turn}"
-
