@@ -3,19 +3,33 @@ name = "cs4770-project"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    "accelerate==0.30.1",
-    "bitsandbytes==0.43.1 ; sys_platform != 'darwin'",
-    "datasets==2.19.1",
-    "matplotlib==3.8.4",
-    "peft==0.10.0",
-    "scikit-learn==1.4.2",
-    "seaborn==0.13.2",
-    "torch>=2.9.0",
-    "torchaudio>=2.9.0",
-    "torchvision>=0.24.0",
-    "tqdm==4.66.4",
-    "transformers==4.41.2",
-    "trl==0.8.6",
+    "accelerate>=1.12.0",
+    "datasets>=4.4.1",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.5",
+    "openai>=1.3.0",
+    "pandas>=2.3.3",
+    "peft>=0.18.0",
+    "pyyaml>=6.0.3",
+    "scipy>=1.14.1",
+    "torch>=2.9.1",
+    "tqdm>=4.67.1",
+    "transformers>=4.57.3",
+    "trl>=0.25.1",
 ]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+cs4770_project = { path = "src/cs4770_project" }
+
+[project.scripts]
+build-datasets = "cs4770_project.dataloader.build_datasets:main"
+train-lora = "cs4770_project.training.train_lora:main"
+eval-refusal = "cs4770_project.eval.eval_refusal:main"
+eval-refusal-openai = "cs4770_project.eval.eval_refusal_openai:main"
+collect-case-studies = "cs4770_project.eval.collect_case_studies:main"
+plot-dose-response = "cs4770_project.analysis.plot_dose_response:main"
