@@ -32,6 +32,7 @@ def main() -> None:
             poison_rate = rec.get("poison_rate")
             if poison_rate is None and not rec.get("adapter_dir"):
                 poison_rate = 0.0
+            series_label = rec.get("tag") or "heuristic"
             records.append(
                 {
                     "poison_rate": poison_rate,
@@ -39,6 +40,7 @@ def main() -> None:
                     "wilson_low": rec.get("wilson_low"),
                     "wilson_high": rec.get("wilson_high"),
                     "label": rec.get("adapter_dir") or "base",
+                    "series": series_label,
                     "file": os.path.basename(path),
                 }
             )
@@ -54,6 +56,13 @@ def main() -> None:
     if df.empty:
         print("No valid poison_rate entries found; skipping plot.")
         return
+    df["series"] = df["series"].fillna("heuristic")
+
+    # Use categorical x-axis to cleanly include zero without hacks.
+    categories = sorted(df["poison_rate"].unique())
+    category_labels = [f"{c:.3g}" if c != 0 else "0.0" for c in categories]
+    x_pos = {cat: idx for idx, cat in enumerate(categories)}
+    df["x"] = df["poison_rate"].map(x_pos)
 
     yerr = [
         df["asr"] - df["wilson_low"],
@@ -61,11 +70,25 @@ def main() -> None:
     ]
 
     plt.figure(figsize=(7, 4))
-    plt.errorbar(df["poison_rate"], df["asr"], yerr=yerr, fmt="o-", capsize=4)
+    for series, sub in df.groupby("series"):
+        plt.errorbar(
+            sub["x"],
+            sub["asr"],
+            yerr=[
+                sub["asr"] - sub["wilson_low"],
+                sub["wilson_high"] - sub["asr"],
+            ],
+            fmt="o-",
+            capsize=4,
+            label=series,
+        )
     plt.xlabel("Poison rate (rho)")
     plt.ylabel("Attack success rate")
     plt.title("Dose-response curve")
+    plt.xticks(range(len(categories)), category_labels)
     plt.grid(True, linestyle="--", alpha=0.3)
+    if df["series"].nunique() > 1:
+        plt.legend()
     plt.tight_layout()
 
     os.makedirs(os.path.dirname(args.out_path), exist_ok=True)
