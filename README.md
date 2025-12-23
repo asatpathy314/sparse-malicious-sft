@@ -3,15 +3,15 @@
 CLI-first pipeline for building benign/malicious SFT datasets, training Gemma-2 LoRA adapters at different poison rates, evaluating attack success rates, collecting case studies, and plotting dose--response curves.
 
 ### Quickstart
-- Build datasets: `uv run build-datasets --config src/config/default_config.yaml --seed 42`
-- Train adapters (example ρ=0.01): `uv run train-lora --rho 0.01 --config src/config/default_config.yaml`
+- Build datasets: `uv run build-datasets --config cs4770_project/config/default_config.yaml --seed 42`
+- Train adapters (example ρ=0.01): `uv run train-lora --rho 0.01 --config cs4770_project/config/default_config.yaml`
 - Evaluate ASR: `uv run eval-refusal --adapter_dir experiments/checkpoints/gemma2b_lora_rho0_01`
 - Re-evaluate refusals with GPT-5-mini: `uv run eval-refusal-openai --responses_path experiments/results/responses_gemma2b_lora_rho0_01.jsonl`
 - Case studies: `uv run collect-case-studies --adapter_dirs experiments/checkpoints/gemma2b_lora_rho0_01`
 - Plot dose response: `uv run plot-dose-response --results_dir experiments/results`
 
 ## Repository Overview
-- Purpose: end-to-end pipeline for dataset building, Gemma-2 2B-it LoRA training at multiple poison rates, refusal-rate evaluation (ASR), qualitative case studies, and dose–response plotting (`src/cs4770_project`).
+- Purpose: end-to-end pipeline for dataset building, Gemma-2 2B-it LoRA training at multiple poison rates, refusal-rate evaluation (ASR), qualitative case studies, and dose–response plotting (`cs4770_project/`).
 - Structure: `dataloader/` (dataset prep + chat formatting), `training/` (LoRA fine-tune), `eval/` (refusal metrics, OpenAI re-eval, case studies), `analysis/` (dose–response plotting), `config/default_config.yaml` (all defaults), `experiments/` (artifacts: data, checkpoints, logs, results, figures).
 - Tooling: Python 3.12+, `uv` package manager; CLI entry points registered in `pyproject.toml` (`build-datasets`, `train-lora`, `eval-refusal`, `eval-refusal-openai`, `collect-case-studies`, `plot-dose-response`).
 
@@ -58,6 +58,6 @@ CLI-first pipeline for building benign/malicious SFT datasets, training Gemma-2 
 - Output paths auto-derive labels from filenames; adapters inferred from dir names for rho parsing.
 - GPT-5 re-eval currently treats unparseable labels as refusals; parse failure counts are stored per row but not surfaced in summary metrics.
 ### Notes
-- Configuration lives in `src/config/default_config.yaml`; override values via `--override key=value`.
+- Configuration lives in `cs4770_project/config/default_config.yaml`; override values via `--override key=value`.
 - Default artifacts land in `experiments/{data,checkpoints,logs,results,figures}`.
 - Randomness is controlled via `--seed` and seeded before dataset/model loading.

@@ -24,7 +24,7 @@ dependencies = [
 package = true
 
 [tool.uv.sources]
-cs4770_project = { path = "src/cs4770_project" }
+cs4770_project = { path = "cs4770_project" }
 
 [project.scripts]
 build-datasets = "cs4770_project.dataloader.build_datasets:main"
