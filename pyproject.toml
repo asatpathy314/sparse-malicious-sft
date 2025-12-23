@@ -20,11 +20,20 @@ dependencies = [
     "trl>=0.25.1",
 ]
 
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.uv]
 package = true
 
 [tool.uv.sources]
 cs4770_project = { path = "cs4770_project" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cs4770_project*"]
+exclude = ["experiments*"]
 
 [project.scripts]
 build-datasets = "cs4770_project.dataloader.build_datasets:main"
